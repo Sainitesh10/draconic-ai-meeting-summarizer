@@ -1,11 +1,16 @@
 import os
 import sqlite3
 import random
+import smtplib
+from email.message import EmailMessage
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import google.generativeai as genai
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Setup Database
 DB_FILE = "app.db"
@@ -62,15 +67,49 @@ class SummarizeModel(BaseModel):
 
 @app.post("/api/auth/request-otp")
 def request_otp(data: RequestOtpModel, db: sqlite3.Connection = Depends(get_db)):
-    # Generate 6 digit OTP (Hardcoded to 123456 for testing prototype without email server)
-    otp = "123456"
+    # Generate real 6 digit OTP
+    otp = str(random.randint(100000, 999999))
     
     # Store OTP in DB (upsert)
     cursor = db.cursor()
     cursor.execute("INSERT OR REPLACE INTO otps (email, otp) VALUES (?, ?)", (data.email, otp))
     db.commit()
     
-    return {"message": "OTP sent to your email! (For testing, use 123456)"}
+    gmail_address = os.getenv("GMAIL_ADDRESS")
+    gmail_password = os.getenv("GMAIL_APP_PASSWORD")
+    
+    if not gmail_address or not gmail_password:
+        return {"message": f"OTP generated (SMTP credentials missing in .env). Use {otp} for testing."}
+        
+    try:
+        msg = EmailMessage()
+        msg['Subject'] = "Your Draconic AI Access Scroll"
+        msg['From'] = gmail_address
+        msg['To'] = data.email
+        
+        # Epic Dark Theme HTML Email
+        msg.set_content(f"""
+        <html>
+          <body style="background-color: #0a0a0a; color: #e5e5e5; font-family: sans-serif; padding: 40px; text-align: center;">
+            <h1 style="color: #dc2626; letter-spacing: 2px;">DRACONIC AI</h1>
+            <p style="margin-bottom: 30px;">An attempt to enter the realm was made using this email address.</p>
+            <p>Your authentication scroll bears the following seal:</p>
+            <div style="background-color: #1a0505; border: 2px solid #dc2626; color: #fff; padding: 20px; font-size: 32px; font-weight: bold; letter-spacing: 10px; margin: 30px auto; max-width: 300px; border-radius: 8px;">
+                {otp}
+            </div>
+            <p style="color: #666; font-size: 12px; margin-top: 40px;">If you did not request this, the scroll will naturally disintegrate.</p>
+          </body>
+        </html>
+        """, subtype='html')
+        
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+            server.login(gmail_address, gmail_password)
+            server.send_message(msg)
+            
+        return {"message": "OTP successfully sent to your email!"}
+    except Exception as e:
+        print(f"SMTP Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to send email. Check your .env app password.")
 
 @app.post("/api/auth/verify-otp")
 def verify_otp(data: VerifyOtpModel, db: sqlite3.Connection = Depends(get_db)):

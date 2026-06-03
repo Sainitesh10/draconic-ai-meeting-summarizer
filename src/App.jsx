@@ -8,7 +8,7 @@ function App() {
   // Auth States
   const [email, setEmail] = useState(localStorage.getItem('user_email') || '');
   const [userName, setUserName] = useState(localStorage.getItem('user_name') || '');
-  const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || 'AIzaSyBz5oExfAJnYPFL7eTdUH3Kh5yVB3JAX-Y');
+  const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || '');
   
   // Onboarding States
   const [authStep, setAuthStep] = useState(email && userName ? 'dashboard' : 'email'); // email, otp, name, dashboard

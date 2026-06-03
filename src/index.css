@@ -1,0 +1,323 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  /* Obsidian & Crimson Dragon Palette */
+  --bg-dark: #000000;          /* Deepest obsidian */
+  --panel-bg: rgba(18, 10, 10, 0.8); /* Dark graphite with red tint */
+  --panel-bg-hover: rgba(28, 12, 12, 0.9);
+  --panel-border: #4a1515;     /* Dark crimson borders */
+  
+  --text-primary: #f8fafc;
+  --text-secondary: #a3a3a3;
+  --text-tertiary: #525252;
+  
+  /* Dragon Fire Accent */
+  --accent-color: #dc2626;     /* Blood red */
+  --accent-hover: #b91c1c;     /* Deep blood red */
+  --accent-light: rgba(220, 38, 38, 0.15);
+  --accent-glow: rgba(220, 38, 38, 0.4);
+  
+  --danger: #ef4444;
+  --success: #10b981;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-dark);
+  /* Smoky inferno gradient from bottom */
+  background-image: 
+    radial-gradient(circle at 50% 120%, rgba(153, 27, 27, 0.25) 0%, transparent 60%),
+    /* Subtle geometric scale pattern using repeating linear gradients */
+    linear-gradient(30deg, #090505 12%, transparent 12.5%, transparent 87%, #090505 87.5%, #090505),
+    linear-gradient(150deg, #090505 12%, transparent 12.5%, transparent 87%, #090505 87.5%, #090505),
+    linear-gradient(30deg, #090505 12%, transparent 12.5%, transparent 87%, #090505 87.5%, #090505),
+    linear-gradient(150deg, #090505 12%, transparent 12.5%, transparent 87%, #090505 87.5%, #090505),
+    linear-gradient(60deg, #0f0505 25%, transparent 25.5%, transparent 75%, #0f0505 75%, #0f0505),
+    linear-gradient(60deg, #0f0505 25%, transparent 25.5%, transparent 75%, #0f0505 75%, #0f0505);
+  background-size: 100% 100%, 80px 140px, 80px 140px, 80px 140px, 80px 140px, 80px 140px, 80px 140px;
+  background-position: 0 0, 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
+  background-attachment: fixed;
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Sharp Dragon Panels */
+.dragon-panel {
+  background-color: var(--panel-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--panel-border);
+  /* Sharp corners for an aggressive look */
+  border-radius: 4px;
+  border-top: 2px solid var(--accent-color); /* Fiery highlight on top edge */
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.8);
+}
+
+.dragon-input {
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--panel-border);
+  color: var(--text-primary);
+  padding: 12px 16px;
+  border-radius: 2px; /* Sharp corners */
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.dragon-input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 15px var(--accent-light);
+}
+
+.dragon-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* App Container */
+.app-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.logo-text {
+  font-family: 'Cinzel', serif; /* Epic, sharp font for the title */
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* Grid Layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--panel-border);
+  border-radius: 0px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}
+
+/* Buttons */
+.btn-primary {
+  background: linear-gradient(180deg, var(--accent-color) 0%, #991b1b 100%);
+  color: white;
+  border: 1px solid #f87171; /* Bright red top border for depth */
+  border-bottom: 2px solid #7f1d1d;
+  padding: 12px 24px;
+  border-radius: 2px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px var(--accent-light);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, #ef4444 0%, var(--accent-hover) 100%);
+  box-shadow: 0 4px 20px var(--accent-glow);
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+  border: 1px solid var(--panel-border);
+  box-shadow: none;
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+}
+.btn-danger:hover:not(:disabled) {
+  background: var(--accent-light);
+}
+
+.btn-icon {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  padding: 8px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-icon:hover {
+  color: var(--accent-color);
+  border-color: var(--panel-border);
+  background: rgba(220, 38, 38, 0.05);
+}
+
+/* Status Indicators */
+@keyframes dragon-breathe {
+  0% { box-shadow: 0 0 5px var(--accent-color); }
+  50% { box-shadow: 0 0 20px var(--accent-color), 0 0 10px #f87171; }
+  100% { box-shadow: 0 0 5px var(--accent-color); }
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-live {
+  background-color: var(--accent-color);
+  animation: dragon-breathe 2s infinite;
+}
+
+.status-idle {
+  background-color: var(--panel-border);
+}
+
+/* Typography & Content Layout */
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.panel-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 1px;
+}
+
+.transcript-area {
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--panel-border);
+  border-radius: 2px;
+  padding: 20px;
+  overflow-y: auto;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.insight-card {
+  background-color: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--panel-border);
+  border-left: 3px solid var(--panel-border);
+  border-radius: 2px;
+  padding: 16px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.insight-card:hover {
+  border-left-color: var(--accent-color);
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.task-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--panel-border);
+}
+.task-item:last-child {
+  border-bottom: none;
+}
+.task-checkbox {
+  margin-top: 4px;
+  accent-color: var(--accent-color);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+/* Onboarding Centered Layout */
+.onboarding-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.onboarding-card {
+  width: 100%;
+  max-width: 460px;
+  padding: 40px;
+  text-align: center;
+  position: relative;
+}
+
+/* Flame accent behind login */
+.onboarding-card::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 20px;
+  background: radial-gradient(ellipse at top, var(--accent-color), transparent 70%);
+  opacity: 0.5;
+  filter: blur(10px);
+  z-index: -1;
+}

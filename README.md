@@ -1,16 +1,78 @@
-# React + Vite
+<div align="center">
+  <img src="public/logo.png" alt="Draconic AI Logo" width="150"/>
+  <h1>Draconic AI Meeting Summarizer 🐉</h1>
+  <p>An elite, AI-powered meeting assistant built to capture live transcripts and forge actionable intelligence.</p>
+</div>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<br/>
 
-Currently, two official plugins are available:
+## 🚀 Project Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Draconic AI is a powerful meeting summarization tool that listens to your conversations in real-time, transcribes the audio, and uses Google's Gemini AI to instantly extract key takeaways, decisions, and personal bounties (tasks) assigned to the user. Built with a stunning dark-fantasy UI, it makes meeting productivity feel like an RPG quest.
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend:** React, Vite, Tailwind CSS, Lucide Icons
+- **Backend:** Python, FastAPI, SQLite
+- **AI/ML:** Google Gemini API
+- **Auth:** Custom OTP Email Authentication via SMTP
 
-## Expanding the ESLint configuration
+## ✨ Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- 🎙️ **Live Audio Capture:** Real-time speech-to-text transcription right in the browser.
+- 🧠 **Forged Intelligence:** Extracts Grand Summaries, Key Decrees (Decisions), and personal "Bounties" (Tasks).
+- 🛡️ **Secure Authentication:** OTP-based email login to ensure your transcripts are safe.
+- 🎨 **Draconic UI:** A highly customized, immersive dark theme with custom scrollbars and hover states.
+
+## 📸 Screenshots
+
+*(Add screenshots of the dashboard and login screen here)*
+
+## ⚙️ Setup Instructions
+
+### Prerequisites
+- Node.js & npm
+- Python 3.9+
+- A Google Gemini API Key
+- A Gmail App Password (for OTPs)
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Sainitesh10/draconic-ai-meeting-summarizer.git
+   cd draconic-ai-meeting-summarizer
+   ```
+
+2. **Frontend Setup:**
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+3. **Backend Setup:**
+   ```bash
+   cd backend
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+
+4. **Environment Variables:**
+   Create a `.env` file in the `backend` directory based on the `.env.example`:
+   ```env
+   GMAIL_ADDRESS=your_email@gmail.com
+   GMAIL_APP_PASSWORD=your_app_password
+   ```
+
+5. **Run the Backend:**
+   ```bash
+   uvicorn main:app --reload --port 8000
+   ```
+
+## 🌐 Live Demo
+
+*(Link to live deployment goes here)*
+
+---
+*Built with passion by [Gudala Sai Nitesh](https://github.com/Sainitesh10)*

@@ -1,40 +1,34 @@
 <div align="center">
   <img src="public/logo.png" alt="Draconic AI Logo" width="150"/>
   <h1>Draconic AI Meeting Summarizer 🐉</h1>
-  <p>An elite, AI-powered meeting assistant built to capture live transcripts and forge actionable intelligence.</p>
+  <p>An elite, Serverless AI-powered meeting assistant built to capture live transcripts and forge actionable intelligence.</p>
 </div>
 
 <br/>
 
 ## 🚀 Project Overview
 
-Draconic AI is a powerful meeting summarization tool that listens to your conversations in real-time, transcribes the audio, and uses Google's Gemini AI to instantly extract key takeaways, decisions, and personal bounties (tasks) assigned to the user. Built with a stunning dark-fantasy UI, it makes meeting productivity feel like an RPG quest.
+**Draconic AI** is a powerful meeting summarization tool that listens to your conversations in real-time or processes uploaded audio recordings (`.mp3`, `.wav`), and uses Google's **Gemini 2.5 Flash AI** to instantly extract key takeaways, decisions, and personal bounties (tasks) assigned to the user. Built with a stunning dark-fantasy UI, it makes meeting productivity feel like an RPG quest.
 
 ## 🛠️ Tech Stack
 
 - **Frontend:** React, Vite, Tailwind CSS, Lucide Icons
-- **Backend:** Python, FastAPI, SQLite
-- **AI/ML:** Google Gemini API
-- **Auth:** Custom OTP Email Authentication via SMTP
+- **AI Engine:** `@google/generative-ai` (Gemini 2.5 Flash)
+- **Architecture:** 100% Serverless (All AI logic executed directly from the frontend)
 
 ## ✨ Features
 
 - 🎙️ **Live Audio Capture:** Real-time speech-to-text transcription right in the browser.
+- 📤 **Audio File Upload:** Upload raw meeting recordings (`.mp3`) and let Gemini 2.5 Flash natively transcribe and summarize them!
 - 🧠 **Forged Intelligence:** Extracts Grand Summaries, Key Decrees (Decisions), and personal "Bounties" (Tasks).
-- 🛡️ **Secure Authentication:** OTP-based email login to ensure your transcripts are safe.
+- 📧 **Follow-Up Dispatch:** Automatically drafts a highly professional follow-up email covering all next steps, ready to be sent to your team.
 - 🎨 **Draconic UI:** A highly customized, immersive dark theme with custom scrollbars and hover states.
-
-## 📸 Screenshots
-
-*(Add screenshots of the dashboard and login screen here)*
 
 ## ⚙️ Setup Instructions
 
 ### Prerequisites
 - Node.js & npm
-- Python 3.9+
 - A Google Gemini API Key
-- A Gmail App Password (for OTPs)
 
 ### Installation
 
@@ -50,25 +44,8 @@ Draconic AI is a powerful meeting summarization tool that listens to your conver
    npm run dev
    ```
 
-3. **Backend Setup:**
-   ```bash
-   cd backend
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-
-4. **Environment Variables:**
-   Create a `.env` file in the `backend` directory based on the `.env.example`:
-   ```env
-   GMAIL_ADDRESS=your_email@gmail.com
-   GMAIL_APP_PASSWORD=your_app_password
-   ```
-
-5. **Run the Backend:**
-   ```bash
-   uvicorn main:app --reload --port 8000
-   ```
+3. **Configure the App:**
+   Open the app at `http://localhost:5173`. You will be prompted to enter your Name and your Gemini API Key directly into the secure local storage. No backend needed!
 
 ## 🌐 Live Demo
 

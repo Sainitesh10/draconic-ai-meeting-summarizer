@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, Settings, Flame, Shield, Swords, LogOut, Loader2, ChevronRight, CheckSquare } from 'lucide-react';
+import { Mic, MicOff, Settings, Flame, Shield, Swords, LogOut, Loader2, ChevronRight, CheckSquare, Upload, Mail } from 'lucide-react';
+import { analyzeMeeting } from './utils/gemini';
 
 function App() {
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const [audioFile, setAudioFile] = useState(null);
   
   // Auth States
-  const [email, setEmail] = useState(localStorage.getItem('user_email') || '');
   const [userName, setUserName] = useState(localStorage.getItem('user_name') || '');
   const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || '');
   
   // Onboarding States
-  const [authStep, setAuthStep] = useState(email && userName ? 'dashboard' : 'email'); // email, otp, name, dashboard
-  const [otpInput, setOtpInput] = useState('');
+  const [authStep, setAuthStep] = useState(userName && apiKey ? 'dashboard' : 'name');
   
   const [showSettings, setShowSettings] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -64,7 +64,7 @@ function App() {
         }
       };
     } else {
-      alert("Your browser does not support Speech Recognition. Please use Google Chrome or Microsoft Edge.");
+      console.warn("Speech Recognition not supported in this browser.");
     }
   }, []);
 
@@ -74,6 +74,7 @@ function App() {
       recognitionRef.current?.stop();
       setIsRecording(false);
     } else {
+      setAudioFile(null); // Clear audio file if starting live recording
       shouldRecordRef.current = true;
       if(!transcript) {
          setSummaryData(null);
@@ -87,88 +88,34 @@ function App() {
     }
   };
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setAudioFile(file);
+      setTranscript(''); // Clear transcript if using audio file
+      setSummaryData(null);
+    }
+  };
+
   const handleApiKeyChange = (e) => {
     setApiKey(e.target.value);
     localStorage.setItem('gemini_api_key', e.target.value);
   };
 
-  const requestOTP = async () => {
-    if (!email) return alert("Please enter your email");
-    try {
-      await fetch('http://localhost:8000/api/auth/request-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      setAuthStep('otp');
-    } catch (e) {
-      alert("Error connecting to backend. Is Python running?");
-    }
-  };
-
-  const verifyOTP = async () => {
-    try {
-      const res = await fetch('http://localhost:8000/api/auth/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp: otpInput })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem('user_email', email);
-        if (data.name) {
-          setUserName(data.name);
-          localStorage.setItem('user_name', data.name);
-          setAuthStep('dashboard');
-        } else {
-          setAuthStep('name');
-        }
-      } else {
-        alert("Invalid OTP!");
-      }
-    } catch (e) {
-      alert("Error verifying OTP");
-    }
-  };
-
-  const saveName = async () => {
-    if (!userName) return alert("Please enter your name");
-    try {
-      await fetch('http://localhost:8000/api/user/name', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, name: userName })
-      });
-      localStorage.setItem('user_name', userName);
-      setAuthStep('dashboard');
-    } catch (e) {
-      alert("Error saving name");
-    }
+  const completeSetup = () => {
+    if (!userName || !apiKey) return alert("Please enter both Name and Gemini API Key");
+    localStorage.setItem('user_name', userName);
+    localStorage.setItem('gemini_api_key', apiKey);
+    setAuthStep('dashboard');
   };
 
   const generateSummary = async () => {
-    if (!transcript) return;
+    if (!transcript && !audioFile) return;
     setIsProcessing(true);
     
     try {
-      const res = await fetch('http://localhost:8000/api/summarize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          email: email, 
-          transcript: transcript,
-          api_key: apiKey
-        })
-      });
-      
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail);
-      
-      let cleanedContent = data.result;
-      cleanedContent = cleanedContent.replace(/```json/gi, '');
-      cleanedContent = cleanedContent.replace(/```/g, '');
-      cleanedContent = cleanedContent.trim();
-      setSummaryData(JSON.parse(cleanedContent));
+      const data = await analyzeMeeting(apiKey, userName, transcript, audioFile);
+      setSummaryData(data);
     } catch (error) {
       console.error('Error generating notes:', error);
       alert('Error generating notes: ' + error.message);
@@ -189,61 +136,37 @@ function App() {
               className="drop-shadow-[0_0_15px_rgba(220,38,38,0.8)]" 
             />
             <h1 className="logo-text justify-center mt-2">DRACONIC AI</h1>
+            <p className="text-gray-400 text-sm mt-2 text-center">Your elite AI Meeting Summarizer powered by Gemini 2.5 Flash.</p>
           </div>
           
-          {authStep === 'email' && (
-            <div className="flex flex-col gap-4 text-left">
-              <label className="text-sm font-semibold text-gray-300 uppercase tracking-wider">Access Email</label>
-              <input 
-                type="email" 
-                placeholder="warrior@realm.com" 
-                className="dragon-input w-full"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && requestOTP()}
-              />
-              <button className="btn-primary w-full mt-4" onClick={requestOTP}>
-                Enter the Realm <ChevronRight size={18} />
-              </button>
-            </div>
-          )}
-
-          {authStep === 'otp' && (
-            <div className="flex flex-col gap-4 text-left">
-              <label className="text-sm font-semibold text-gray-300 uppercase tracking-wider">Authentication Scroll</label>
-              <p className="text-xs text-gray-400 mb-2">A 6-digit code has been forged and sent to <strong className="text-red-400">{email}</strong>.</p>
-              <input 
-                type="text" 
-                placeholder="• • • • • •" 
-                className="dragon-input w-full text-center tracking-[0.5em] text-xl font-bold"
-                value={otpInput}
-                maxLength={6}
-                onChange={e => setOtpInput(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && verifyOTP()}
-              />
-              <button className="btn-primary w-full mt-4" onClick={verifyOTP}>
-                Verify Code
-              </button>
-            </div>
-          )}
-
-          {authStep === 'name' && (
-            <div className="flex flex-col gap-4 text-left">
+          <div className="flex flex-col gap-4 text-left">
+            <div className="space-y-1">
               <label className="text-sm font-semibold text-gray-300 uppercase tracking-wider">Identify Thyself</label>
-              <p className="text-xs text-gray-400 mb-2">What name shall the AI use to identify your assigned bounties and tasks?</p>
               <input 
                 type="text" 
-                placeholder="Your Name" 
+                placeholder="Your Name (e.g. John Doe)" 
                 className="dragon-input w-full"
                 value={userName}
                 onChange={e => setUserName(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && saveName()}
               />
-              <button className="btn-primary w-full mt-4" onClick={saveName}>
-                Complete Setup
-              </button>
             </div>
-          )}
+            
+            <div className="space-y-1 mt-2">
+              <label className="text-sm font-semibold text-gray-300 uppercase tracking-wider">Gemini API Key</label>
+              <input 
+                type="password" 
+                placeholder="AI_xxxxxxxxxxxx" 
+                className="dragon-input w-full"
+                value={apiKey}
+                onChange={e => setApiKey(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && completeSetup()}
+              />
+            </div>
+
+            <button className="btn-primary w-full mt-4" onClick={completeSetup}>
+              Enter the Realm <ChevronRight size={18} />
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -264,7 +187,7 @@ function App() {
         <div className="flex gap-4 items-center">
           <div className="flex flex-col text-right pr-4 border-r border-[#4a1515]">
             <span className="text-sm font-bold text-white uppercase tracking-wider">{userName}</span>
-            <span className="text-xs text-red-300/60">{email}</span>
+            <span className="text-xs text-red-300/60">Commander</span>
           </div>
           
           {showSettings && (
@@ -288,21 +211,37 @@ function App() {
       <main className="dashboard-grid">
         {/* Left Panel: Recording & Transcript */}
         <div className="dragon-panel flex flex-col h-full overflow-hidden p-6">
-          <div className="panel-header">
-            <h2 className="panel-title">
+          <div className="panel-header flex justify-between items-center">
+            <h2 className="panel-title flex-1">
               <span className={`status-dot ${isRecording ? 'status-live' : 'status-idle'}`} />
-              Live Transcript
+              Audio Input
             </h2>
-            <button 
-              onClick={toggleRecording}
-              className={`btn-primary ${isRecording ? 'btn-danger' : ''}`}
-            >
-              {isRecording ? <><MicOff size={18} /> Cease Capture</> : <><Mic size={18} /> Ignite Capture</>}
-            </button>
           </div>
           
-          <div className="transcript-area mb-6">
-            {transcript ? (
+          <div className="flex gap-4 mb-4">
+            <button 
+              onClick={toggleRecording}
+              className={`flex-1 btn-primary ${isRecording ? 'btn-danger' : ''}`}
+            >
+              {isRecording ? <><MicOff size={18} /> Cease Capture</> : <><Mic size={18} /> Live Record</>}
+            </button>
+
+            <label className="flex-1 btn-primary cursor-pointer text-center justify-center">
+              <Upload size={18} /> Upload Audio
+              <input type="file" accept="audio/*" className="hidden" onChange={handleFileUpload} />
+            </label>
+          </div>
+          
+          <div className="transcript-area mb-6 flex-1 overflow-y-auto">
+            {audioFile ? (
+              <div className="h-full flex flex-col items-center justify-center opacity-70 gap-4 text-center p-4">
+                <Upload size={40} className="text-red-400" />
+                <div>
+                  <p className="font-bold text-lg text-red-100">{audioFile.name}</p>
+                  <p className="text-sm text-red-300 mt-1">{(audioFile.size / (1024 * 1024)).toFixed(2)} MB • Ready for AI Extraction</p>
+                </div>
+              </div>
+            ) : transcript ? (
               <span>{transcript}</span>
             ) : (
               <div className="h-full flex flex-col items-center justify-center opacity-40 gap-4">
@@ -314,7 +253,7 @@ function App() {
 
           <button 
             onClick={generateSummary}
-            disabled={!transcript || isRecording || isProcessing}
+            disabled={(!transcript && !audioFile) || isRecording || isProcessing}
             className="btn-primary w-full py-4 text-lg"
           >
             {isProcessing ? (
@@ -356,14 +295,16 @@ function App() {
               )}
 
               {/* General Summary */}
-              <div className="insight-card">
-                <h3 className="text-white font-bold mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
-                  <Shield className="text-gray-500" size={18} /> Grand Summary
-                </h3>
-                <p className="text-gray-400 text-sm leading-relaxed">
-                  {summaryData.summary}
-                </p>
-              </div>
+              {summaryData.summary && (
+                <div className="insight-card">
+                  <h3 className="text-white font-bold mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
+                    <Shield className="text-gray-500" size={18} /> Grand Summary
+                  </h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">
+                    {summaryData.summary}
+                  </p>
+                </div>
+              )}
               
               {/* Key Decisions */}
               {summaryData.decisions && summaryData.decisions.length > 0 && (
@@ -376,6 +317,28 @@ function App() {
                   </ul>
                 </div>
               )}
+
+              {/* Follow-up Email */}
+              {summaryData.follow_up_email && (
+                <div className="insight-card mt-2">
+                  <h3 className="text-white font-bold mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
+                    <Mail className="text-blue-400" size={18} /> Follow-Up Dispatch
+                  </h3>
+                  <div className="bg-black/30 p-4 rounded-lg border border-gray-800">
+                    <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap font-serif">
+                      {summaryData.follow_up_email}
+                    </p>
+                  </div>
+                  <button className="mt-3 text-xs text-red-400 hover:text-red-300 uppercase tracking-widest font-bold"
+                          onClick={() => {
+                            navigator.clipboard.writeText(summaryData.follow_up_email);
+                            alert("Dispatch copied to clipboard!");
+                          }}>
+                    Copy Dispatch
+                  </button>
+                </div>
+              )}
+
             </div>
           )}
         </div>

@@ -49,7 +49,8 @@
 
 ## 🌐 Live Demo
 
-*(Link to live deployment goes here)*
+You can try the live deployed version here:
+👉 **[https://draconic-ai-meeting-summarizer.vercel.app/](https://draconic-ai-meeting-summarizer.vercel.app/)**
 
 ---
 *Built with passion by [Gudala Sai Nitesh](https://github.com/Sainitesh10)*
